@@ -1,17 +1,18 @@
-#!name=Meta Unlock (Pure Header Rewrite)
-#!desc=使用 Header 重写解锁 Meta 地区，无需外部脚本
+#!name=Meta Unlock (With Policy)
+#!desc=解锁 Meta 地区并指定策略
 #!author=Helper
 #!icon=https://raw.githubusercontent.com/Semporia/Hand-Painted-icon/master/Social_Media/Instagram.png
 
 [Rule]
-DOMAIN-SUFFIX,instagram.com
-DOMAIN-SUFFIX,threads.net
-DOMAIN-SUFFIX,facebook.com
-DOMAIN-SUFFIX,fbcdn.net
-DOMAIN-SUFFIX,cdninstagram.com
+# 将以下域名强制指向你的指定代理策略，请确保 "PROXY" 是你 Loon 里的策略组名称
+DOMAIN-SUFFIX,instagram.com,PROXY
+DOMAIN-SUFFIX,threads.net,PROXY
+DOMAIN-SUFFIX,facebook.com,PROXY
+DOMAIN-SUFFIX,fbcdn.net,PROXY
+DOMAIN-SUFFIX,cdninstagram.com,PROXY
 
 [Header Rewrite]
-# 强制将 Meta 相关请求的地区识别 Header 改为日本 (44020)
+# 修改请求头以伪装地区
 ^https?://.*(instagram|threads|facebook|fbcdn|cdninstagram)\.com/.* header-replace X-MCCMNC 44020
 ^https?://.*(instagram|threads|facebook|fbcdn|cdninstagram)\.com/.* header-replace x-mccmnc 44020
 
