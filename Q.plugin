@@ -1,10 +1,8 @@
-#!name=Meta Unlock (With Policy)
-#!desc=解锁 Meta 地区并指定策略
+#!name=Meta Unlock (Final Fix)
+#!desc=修复 HTTP/2 Stream -530 错误
 #!author=Helper
-#!icon=https://raw.githubusercontent.com/Semporia/Hand-Painted-icon/master/Social_Media/Instagram.png
 
 [Rule]
-# 将以下域名强制指向你的指定代理策略，请确保 "PROXY" 是你 Loon 里的策略组名称
 DOMAIN-SUFFIX,instagram.com,PROXY
 DOMAIN-SUFFIX,threads.net,PROXY
 DOMAIN-SUFFIX,facebook.com,PROXY
@@ -12,9 +10,9 @@ DOMAIN-SUFFIX,fbcdn.net,PROXY
 DOMAIN-SUFFIX,cdninstagram.com,PROXY
 
 [Header Rewrite]
-# 修改请求头以伪装地区
-^https?://.*(instagram|threads|facebook|fbcdn|cdninstagram)\.com/.* header-replace X-MCCMNC 44020
-^https?://.*(instagram|threads|facebook|fbcdn|cdninstagram)\.com/.* header-replace x-mccmnc 44020
+^https?://(i|graph|api|web)\.(instagram|threads|facebook|fbcdn|cdninstagram)\.com/.* header-replace X-MCCMNC 44020
+^https?://(i|graph|api|web)\.(instagram|threads|facebook|fbcdn|cdninstagram)\.com/.* header-replace x-mccmnc 44020
 
 [MITM]
-hostname = *.instagram.com, *.threads.net, *.facebook.com, *.fbcdn.net, *.cdninstagram.com
+# 核心修正：排除掉会导致 -530 错误的域名，只保留核心 API
+hostname = i.instagram.com, graph.instagram.com, api.instagram.com, *.threads.net, *.facebook.com, -i-fallback.*, -edge-chat.*
