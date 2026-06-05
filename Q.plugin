@@ -1,22 +1,20 @@
-#!name=Meta Regional Optimization
-#!desc=Threads/IG/FB 流量分流与环境优化（自动走 Proxy 组）
+#!name=Meta Japan MNC Optimization
+#!desc=精准修改 Meta API 中的 MNC 参数以伪装日本运营商，避开长连接报错
 #!author=Collaboration
 #!icon=https://raw.githubusercontent.com/Loon-Plugins/Icons/master/Meta.png
 
 [Rule]
-# 强制 Meta 系域名走 Proxy 策略组
+# 强制 Meta 系核心业务流量走日本代理
 DOMAIN-SUFFIX,threads.net,Proxy
 DOMAIN-SUFFIX,instagram.com,Proxy
-DOMAIN-SUFFIX,cdninstagram.com,Proxy
 DOMAIN-SUFFIX,facebook.com,Proxy
-DOMAIN-SUFFIX,fbcdn.net,Proxy
-DOMAIN-SUFFIX,fbsbx.com,Proxy
-DOMAIN-SUFFIX,meta.com,Proxy
+DOMAIN-SUFFIX,graph.facebook.com,Proxy
 
 [Rewrite]
-# 运营商伪装：仅在遭遇特定区域检测时使用
-(?<=&mcc_mnc=)460\d{2}(?=&) 44020
+# 手术刀式替换：仅针对 URL 中包含 mcc_mnc 的参数进行精准替换
+# 不使用 307 重定向，采用内部直接替换，减少连接异常
+(?<=mcc_mnc=)460\d{2} 44020 replace
 
 [MITM]
-# 开启 MITM 以支持重写规则
-hostname = *.threads.net, *.instagram.com, *.facebook.com, *.fbcdn.net
+# 精准锁定 API 接口，跳过复杂的 CDN 静态资源，彻底消除 MITM FAILED 报错
+hostname = graph.facebook.com, api.threads.net, i.instagram.com
