@@ -1,9 +1,17 @@
 #!name=Meta Unlock (Pure Header Rewrite)
-#!desc=纯 Header 重写模式解锁 Meta 地区，无需外部脚本
+#!desc=使用 Header 重写解锁 Meta 地区，无需外部脚本
 #!author=Helper
 #!icon=https://raw.githubusercontent.com/Semporia/Hand-Painted-icon/master/Social_Media/Instagram.png
 
+[Rule]
+DOMAIN-SUFFIX,instagram.com
+DOMAIN-SUFFIX,threads.net
+DOMAIN-SUFFIX,facebook.com
+DOMAIN-SUFFIX,fbcdn.net
+DOMAIN-SUFFIX,cdninstagram.com
+
 [Header Rewrite]
+# 强制将 Meta 相关请求的地区识别 Header 改为日本 (44020)
 ^https?://.*(instagram|threads|facebook|fbcdn|cdninstagram)\.com/.* header-replace X-MCCMNC 44020
 ^https?://.*(instagram|threads|facebook|fbcdn|cdninstagram)\.com/.* header-replace x-mccmnc 44020
 
