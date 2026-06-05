@@ -1,18 +1,22 @@
-#!name=Meta Unlock (Final Fix)
-#!desc=修复 HTTP/2 Stream -530 错误
-#!author=Helper
+#!name=Meta Regional Optimization
+#!desc=Threads/IG/FB 流量分流与环境优化（自动走 Proxy 组）
+#!author=Collaboration
+#!icon=https://raw.githubusercontent.com/Loon-Plugins/Icons/master/Meta.png
 
 [Rule]
-DOMAIN-SUFFIX,instagram.com,PROXY
-DOMAIN-SUFFIX,threads.net,PROXY
-DOMAIN-SUFFIX,facebook.com,PROXY
-DOMAIN-SUFFIX,fbcdn.net,PROXY
-DOMAIN-SUFFIX,cdninstagram.com,PROXY
+# 强制 Meta 系域名走 Proxy 策略组
+DOMAIN-SUFFIX,threads.net,Proxy
+DOMAIN-SUFFIX,instagram.com,Proxy
+DOMAIN-SUFFIX,cdninstagram.com,Proxy
+DOMAIN-SUFFIX,facebook.com,Proxy
+DOMAIN-SUFFIX,fbcdn.net,Proxy
+DOMAIN-SUFFIX,fbsbx.com,Proxy
+DOMAIN-SUFFIX,meta.com,Proxy
 
-[Header Rewrite]
-^https?://(i|graph|api|web)\.(instagram|threads|facebook|fbcdn|cdninstagram)\.com/.* header-replace X-MCCMNC 44020
-^https?://(i|graph|api|web)\.(instagram|threads|facebook|fbcdn|cdninstagram)\.com/.* header-replace x-mccmnc 44020
+[Rewrite]
+# 运营商伪装：仅在遭遇特定区域检测时使用
+(?<=&mcc_mnc=)460\d{2}(?=&) 44020
 
 [MITM]
-# 核心修正：排除掉会导致 -530 错误的域名，只保留核心 API
-hostname = i.instagram.com, graph.instagram.com, api.instagram.com, *.threads.net, *.facebook.com, -i-fallback.*, -edge-chat.*
+# 开启 MITM 以支持重写规则
+hostname = *.threads.net, *.instagram.com, *.facebook.com, *.fbcdn.net
