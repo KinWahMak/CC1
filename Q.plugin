@@ -17,4 +17,4 @@ DOMAIN-SUFFIX,graph.facebook.com,Proxy
 
 [MITM]
 # 精准锁定 API 接口，跳过复杂的 CDN 静态资源，彻底消除 MITM FAILED 报错
-hostname = graph.facebook.com, api.threads.net, i.instagram.com
+hostname = graph.facebook.com, api.threads.net
