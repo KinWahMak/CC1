@@ -1,22 +1,20 @@
-#!name=Meta Taiwan Force (Optimized)
-#!desc=精准修改 Meta API 中的运营商参数，通过避开根域名 SSL Pinning 降低报错概率。
+#!name=Meta Force MCC-MNC
+#!desc=使用重定向机制强制重写请求参数，规避 SSL Pinning 报错
 #!author=Collaboration
-#!icon=https://raw.githubusercontent.com/Loon-Plugins/Icons/master/Meta.png
 
 [Rule]
-# 强制所有 Meta 系流量走你的台湾节点策略组
+# 强制 Meta 系流量走台湾代理
 DOMAIN-SUFFIX,threads.net,Proxy
 DOMAIN-SUFFIX,instagram.com,Proxy
 DOMAIN-SUFFIX,facebook.com,Proxy
 DOMAIN-SUFFIX,graph.facebook.com,Proxy
 
 [Rewrite]
-# 仅针对具体的 API 路径进行 mcc_mnc 参数替换
-# 使用正则匹配包含 mnc 参数的请求，强制替换为 46689 (台湾之星)
-(?<=mcc_mnc=)\d{5} 46689 replace
+# 核心逻辑：正则匹配包含 mcc_mnc 的 URL，将其 307 重定向到带有 46689 的新 URL
+# 这样不需要 MITM 解密，通过重定向强制 App 重新请求正确的参数
+^https://graph\.facebook\.com/(.*)mcc_mnc=\d{5}(.*)$ https://graph.facebook.com/$1mcc_mnc=46689$2 307
+^https://api\.threads\.net/(.*)mcc_mnc=\d{5}(.*)$ https://api.threads.net/$1mcc_mnc=46689$2 307
 
 [MITM]
-# 核心策略：排除根域名，只拦截 API 路径，避开 SSL Pinning 防御
-# - 开头表示排除，后面跟具体匹配规则
-hostname = -graph.facebook.com, *.graph.facebook.com, *.api.threads.net
-
+# 彻底关闭 MITM，不再解密，彻底消除 TLS EOF 和 MITM Failed
+hostname = 
