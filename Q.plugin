@@ -1,20 +1,23 @@
-#!name=Meta Force MCC-MNC
-#!desc=使用重定向机制强制重写请求参数，规避 SSL Pinning 报错
+#!name=Meta Taiwan MCC Rewrite
+#!desc=精准修改 Meta API 参数，通过正则匹配避开 SSL Pinning 根域名拦截。
 #!author=Collaboration
 
 [Rule]
-# 强制 Meta 系流量走台湾代理
+# Meta 系流量强制走台湾节点
 DOMAIN-SUFFIX,threads.net,Proxy
 DOMAIN-SUFFIX,instagram.com,Proxy
 DOMAIN-SUFFIX,facebook.com,Proxy
 DOMAIN-SUFFIX,graph.facebook.com,Proxy
 
-[Rewrite]
-# 核心逻辑：正则匹配包含 mcc_mnc 的 URL，将其 307 重定向到带有 46689 的新 URL
-# 这样不需要 MITM 解密，通过重定向强制 App 重新请求正确的参数
-^https://graph\.facebook\.com/(.*)mcc_mnc=\d{5}(.*)$ https://graph.facebook.com/$1mcc_mnc=46689$2 307
-^https://api\.threads\.net/(.*)mcc_mnc=\d{5}(.*)$ https://api.threads.net/$1mcc_mnc=46689$2 307
-
 [MITM]
-# 彻底关闭 MITM，不再解密，彻底消除 TLS EOF 和 MITM Failed
-hostname = 
+# 仅对 graph.facebook.com 下的 API 路径开启拦截
+# 根域名 graph.facebook.com 不会报错，因为我们只拦截具体的接口路径
+hostname = graph.facebook.com
+
+[Rewrite]
+# 核心修正：使用正则精准匹配 v 后的版本号路径，专门处理 activities 等 API
+# 替换逻辑：匹配 mcc_mnc= 后的五位数字并替换为 46689
+^https?:\/\/graph\.facebook\.com\/v\d+\.\d+\/.*mcc_mnc=\d{5} 46689 replace-mcc-mnc
+
+# 如果你有其他特定路径，请在这里添加类似的匹配规则
+# 只要路径中包含 mcc_mnc，正则就会精准捕捉并只修改参数，而不触碰其余的加密证书结构
