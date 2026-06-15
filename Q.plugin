@@ -13,7 +13,7 @@ DOMAIN-SUFFIX,graph.facebook.com,Proxy
 [Rewrite]
 # 精准匹配任意运营商代码并强制替换为台湾中华电信 (46611)
 # 修正了之前的正则，确保无论请求携带的是中国还是其他地区的码，都会被覆盖
-(?<=mcc_mnc=)\d{5} 46611 replace
+(?<=mcc_mnc=)\d{5} 46689 replace
 
 [MITM]
 # 精准锁定 API 域名，避免解密 CDN 报错
