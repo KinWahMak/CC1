@@ -1,20 +1,20 @@
-#!name=Meta Japan MNC Optimization
-#!desc=精准修改 Meta API 中的 MNC 参数以伪装日本运营商，避开长连接报错
+#!name=Meta Taiwan Region Force
+#!desc=强制 Meta API 识别为台湾运营商，并绕过长连接劫持
 #!author=Collaboration
 #!icon=https://raw.githubusercontent.com/Loon-Plugins/Icons/master/Meta.png
 
 [Rule]
-# 强制 Meta 系核心业务流量走日本代理
+# 强制 Meta 系流量走台湾策略组（请确保你 Loon 的 "Proxy" 策略组中已切换为台湾节点）
 DOMAIN-SUFFIX,threads.net,Proxy
 DOMAIN-SUFFIX,instagram.com,Proxy
 DOMAIN-SUFFIX,facebook.com,Proxy
 DOMAIN-SUFFIX,graph.facebook.com,Proxy
 
 [Rewrite]
-# 手术刀式替换：仅针对 URL 中包含 mcc_mnc 的参数进行精准替换
-# 不使用 307 重定向，采用内部直接替换，减少连接异常
-(?<=mcc_mnc=)460\d{2} 44020 replace
+# 精准匹配任意运营商代码并强制替换为台湾中华电信 (46611)
+# 修正了之前的正则，确保无论请求携带的是中国还是其他地区的码，都会被覆盖
+(?<=mcc_mnc=)\d{5} 46611 replace
 
 [MITM]
-# 精准锁定 API 接口，跳过复杂的 CDN 静态资源，彻底消除 MITM FAILED 报错
+# 精准锁定 API 域名，避免解密 CDN 报错
 hostname = graph.facebook.com, api.threads.net
