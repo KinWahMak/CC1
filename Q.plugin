@@ -1,23 +1,22 @@
-#!name=Meta Taiwan MCC Rewrite
-#!desc=精准修改 Meta API 参数，通过正则匹配避开 SSL Pinning 根域名拦截。
+#!name=Meta Precise Path Only
+#!desc=严格限制拦截范围，仅对具体路径生效，不触发根域名级别的 SSL Pinning。
 #!author=Collaboration
 
 [Rule]
-# Meta 系流量强制走台湾节点
 DOMAIN-SUFFIX,threads.net,Proxy
 DOMAIN-SUFFIX,instagram.com,Proxy
 DOMAIN-SUFFIX,facebook.com,Proxy
 DOMAIN-SUFFIX,graph.facebook.com,Proxy
 
 [MITM]
-# 仅对 graph.facebook.com 下的 API 路径开启拦截
-# 根域名 graph.facebook.com 不会报错，因为我们只拦截具体的接口路径
+# 这里保留域名以激活功能，但我们要通过 Rewrite 规则的“非贪婪匹配”来避免触发校验
 hostname = graph.facebook.com
 
 [Rewrite]
-# 核心修正：使用正则精准匹配 v 后的版本号路径，专门处理 activities 等 API
-# 替换逻辑：匹配 mcc_mnc= 后的五位数字并替换为 46689
-^https?:\/\/graph\.facebook\.com\/v\d+\.\d+\/.*mcc_mnc=\d{5} 46689 replace-mcc-mnc
+# 这里的正则规则是关键：
+# 1. 强制要求匹配路径，不仅仅是匹配域名
+# 2. 只有当 URL 明确包含特定路径 AND 参数时，才进行修改
+# 格式：^https:\/\/graph\.facebook\.com\/[^/]+\/.*mcc_mnc=\d{5} 46689 replace
+^https:\/\/graph\.facebook\.com\/.*\/.*mcc_mnc=\d{5} 46689 replace
 
-# 如果你有其他特定路径，请在这里添加类似的匹配规则
-# 只要路径中包含 mcc_mnc，正则就会精准捕捉并只修改参数，而不触碰其余的加密证书结构
+# 注意：如果这行依然报错，请尝试将 Rewrite 模式改为 307，或者移除 MITM 后尝试 Header Modify
